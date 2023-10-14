@@ -54,13 +54,15 @@ app.post("/cadastrar", (req, res) => {
           console.log(error);
           return;
         }
-        res.status(200).send("Usuario Cadastrado");
+        res.status(200).json({ message: "Usuário cadastrado com sucesso!" });
       });
     } else {
-      res.status(400).send("Email já cadastrado");
+      res.status(400).json({ message: "Email já cadastrado, favor logar" });
     }
   });
 });
+
+///////////////////Logar
 
 app.post("/logar", (req, res) => {
   const { email2, senha2 } = req.body;
@@ -75,6 +77,9 @@ app.post("/logar", (req, res) => {
     }
 
     const total = result[0].total;
+
+    console.log("ola" + email2 + senha2);
+    console.log(total);
 
     if (total === 1) {
       const getData =
@@ -93,10 +98,12 @@ app.post("/logar", (req, res) => {
         log = true;
       });
 
-      res.status(200).send("Logado");
+      log = true;
+
+      res.status(200).json({ message: "Logado" });
     } else {
       log = false;
-      res.status(400).send("Usuário ou senha Inválidos");
+      res.status(400).json({ message: "Usuário ou senha inválidos" });
     }
   });
 });
@@ -125,10 +132,23 @@ app.post("/addImovel", (req, res) => {
       return;
     }
 
-    res.status(200).send("Imóvel cadastrado com sucesso!");
+    res.status(200).json({ message: "Imóvel cadastrado com sucesso!" });
   });
 });
 
-app.get("/log", (req, res) => {
-  res.json({ log, nome });
+app.get("/getElements/:id", (req, res) => {
+  const id = req.params.id;
+
+  const get = "select * from imóveis where id_usuario = ?";
+
+  db.query(get, [id], (error, result) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const resultado = result;
+
+    res.json(resultado);
+  });
 });

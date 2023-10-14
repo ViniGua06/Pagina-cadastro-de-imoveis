@@ -1,5 +1,6 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
+import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
 
 function App() {
   const [logado, setLogado] = useState(false);
@@ -11,7 +12,19 @@ function App() {
   const [emailFront, setEmailFront] = useState(null);
   const [senhaFront, setSenhaFront] = useState(null);
 
-  const [animacao, setAnimacao] = useState(false);
+  const [mensagem, setMensagem] = useState("");
+
+  const [nCadastro, setN] = useState("");
+  const [eCadastro, setE] = useState("");
+  const [sCadastro, setS] = useState("");
+
+  const [imoveisTela, setImoveisTela] = useState(false);
+
+  const [titulo, setTitulo] = useState("");
+  const [desc, setDesc] = useState("");
+  const [url, setUrl] = useState("");
+
+  const [elementos, setElementos] = useState([]);
 
   useEffect(() => {
     const input = document.getElementsByTagName("input")[0];
@@ -31,31 +44,97 @@ function App() {
     });
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmitLogin = async (e) => {
+    e.preventDefault();
+
     try {
       const response = await fetch("http://localhost:2000/logar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: email,
-          senha: senha,
+          email2: email,
+          senha2: senha,
         }),
       });
 
-      const data = await response.json();
-
-      setLogado(data.log);
-      setNome(data.nome);
-
-      if (response.status === 204) {
+      if (response.status === 200) {
+        const data = await response.json();
+        setMensagem(data.message);
         setLogado(true);
+        setNome(data.nome);
       } else {
-        setLogado(true);
+        const data = await response.json();
+        setMensagem(data.message);
+        setLogado(false);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleSubmitCadastro = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:2000/cadastrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: nCadastro,
+          email: eCadastro,
+          senha: sCadastro,
+        }),
+      });
+
+      const data = await response.json();
+
+      setMensagem(data.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmitImovel = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:2000/addImovel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imovel: titulo,
+          desc: desc,
+          src: url,
+        }),
+      });
+
+      const data = await response.json();
+
+      alert(data.message);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getImoveisData = async () => {
+    try {
+      const response = await fetch(`http://localhost:2000/getElements/${id}`);
+      const data = await response.json();
+      console.log(data);
+
+      if (data) {
+        setElementos(data);
+      } else {
+        setElementos([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getImoveisData();
+  }, [logado, imoveisTela]);
 
   const getData = async () => {
     try {
@@ -71,59 +150,66 @@ function App() {
     }
   };
 
-  const getLog = async () => {
-    try {
-      const response = await fetch("http://localhost:2000/log");
-      const data = await response.json();
-
-      setLogado(data.log);
-      setNome(data.nome);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getLog();
-  }, []);
-
   useEffect(() => {
     getData();
-  }, []);
+  }, [logado]);
 
   return (
     <div>
       {!logado ? (
         <main>
           <div className="Cadastro">
-            <form method="post" action="http://localhost:2000/cadastrar">
+            <form
+              method="post"
+              action="http://localhost:2000/cadastrar"
+              onSubmit={handleSubmitCadastro}
+            >
               <h1 align="center" id="h1">
                 Cadastro
               </h1>
               <label id="lablNome">Nome Completo</label>
-              <input type="text" id="nome" name="nome" required></input>
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                value={nCadastro}
+                onChange={(e) => setN(e.target.value)}
+                required
+              ></input>
               <br></br>
               <label id="lblEmail">Email</label>
-              <input type="email" id="email" name="email" required></input>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={eCadastro}
+                onChange={(e) => setE(e.target.value)}
+                required
+              ></input>
               <br></br>
               <label id="lblSenha">Senha</label>
-              <input type="password" id="senha" name="senha" required></input>
+              <input
+                type="password"
+                id="senha"
+                name="senha"
+                value={sCadastro}
+                onChange={(e) => setS(e.target.value)}
+                required
+              ></input>
               <br></br>
               <input type="submit" value="Cadastrar" id="submit"></input>
             </form>
           </div>
+
           <div className="Login">
-            <form
-              method="post"
-              action="http://localhost:2000/logar"
-              onSubmit={handleSubmit}
-            >
+            <form method="post" action="http://localhost:2000/logar">
               <h1 align="center">Login</h1>
               <label>Email</label>
               <input
                 type="Email"
                 required
                 name="email2"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               ></input>
               <br></br>
@@ -133,31 +219,84 @@ function App() {
                 type="password"
                 required
                 name="senha2"
-                onChange={(e) => setSenha(e.currentTarget.value)}
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
               ></input>
               <br></br>
               <br></br>
-              <input type="submit" value="Logar"></input>
+              <input
+                type="submit"
+                value="Logar"
+                onClick={handleSubmitLogin}
+              ></input>
             </form>
           </div>
+          {mensagem && (
+            <h1 style={{ color: "rgba(34, 55, 11, 0.9)" }}>{mensagem}</h1>
+          )}
         </main>
       ) : (
         <>
           <h1>Ola {nome}</h1>
           <h2>ID {id}</h2>
-          <form method="post" action="http://localhost:2000/addImovel">
+          <form
+            method="post"
+            action="http://localhost:2000/addImovel"
+            onSubmit={handleSubmitImovel}
+          >
             <label>Nome do Imóvel</label>
-            <input type="text" name="imovel"></input>
+            <input
+              type="text"
+              name="imovel"
+              value={titulo}
+              onChange={(e) => setTitulo(e.target.value)}
+            ></input>
             <br></br>
             <label>Descrição do Imóvel</label>
-            <textarea name="desc"></textarea>
+            <textarea
+              name="desc"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+            ></textarea>
             <br></br>
             <label>Fonte da imagem principal</label>
-            <input type="text" name="src"></input>
+            <input
+              type="text"
+              name="src"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            ></input>
             <br></br>
             <input type="submit"></input>
           </form>
-          <button onClick={() => setLogado(false)}>Sair</button>
+          <button
+            onClick={() => {
+              setLogado(false);
+              setMensagem(" ");
+            }}
+          >
+            Sair
+          </button>
+          <button
+            onClick={() =>
+              imoveisTela ? setImoveisTela(false) : setImoveisTela(true)
+            }
+          >
+            {imoveisTela ? <p>Ocultar Imóveis</p> : <p>Mostrar Imóveis</p>}
+          </button>
+          {imoveisTela ? (
+            <>
+              {elementos.map((item) => {
+                return (
+                  <div className="card" key={item.id}>
+                    <h2>{item.nome}</h2>
+                    <img src={item.imagem}></img>
+                    <p>{item.descricao}</p>
+                  </div>
+                );
+              })}
+            </>
+          ) : null}
         </>
       )}
     </div>

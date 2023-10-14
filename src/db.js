@@ -5,7 +5,6 @@ const db = mysql.createConnection({
   user: "root",
   password: "Mel060616",
   database: "outro_projeto_db",
-  port: 3306,
 });
 
 db.connect((error) => {
@@ -17,4 +16,4 @@ db.connect((error) => {
   console.log("Conexão ao banco de dados MySql bem sucedida!");
 });
 
-module.exports = db;
+module.exports = { db };
