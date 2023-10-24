@@ -1,6 +1,5 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
 
 function App() {
   const [logado, setLogado] = useState(false);
@@ -42,20 +41,23 @@ function App() {
         input.value = resultado;
       }
     });
-  }, []);
+  }, [logado]);
 
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:2000/logar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email2: email,
-          senha2: senha,
-        }),
-      });
+      const response = await fetch(
+        "https://api-cadastro-three.vercel.app/logar",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email2: email,
+            senha2: senha,
+          }),
+        }
+      );
 
       if (response.status === 200) {
         const data = await response.json();
@@ -76,15 +78,18 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:2000/cadastrar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: nCadastro,
-          email: eCadastro,
-          senha: sCadastro,
-        }),
-      });
+      const response = await fetch(
+        "https://api-cadastro-three.vercel.app/cadastrar",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nome: nCadastro,
+            email: eCadastro,
+            senha: sCadastro,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -98,15 +103,18 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:2000/addImovel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imovel: titulo,
-          desc: desc,
-          src: url,
-        }),
-      });
+      const response = await fetch(
+        "https://api-cadastro-three.vercel.app/addImovel",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imovel: titulo,
+            desc: desc,
+            src: url,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -118,7 +126,9 @@ function App() {
 
   const getImoveisData = async () => {
     try {
-      const response = await fetch(`http://localhost:2000/getElements/${id}`);
+      const response = await fetch(
+        `https://api-cadastro-three.vercel.app/getElements/${id}`
+      );
       const data = await response.json();
       console.log(data);
 
@@ -138,7 +148,9 @@ function App() {
 
   const getData = async () => {
     try {
-      const response = await fetch("http://localhost:2000/getData");
+      const response = await fetch(
+        "https://api-cadastro-three.vercel.app/getData"
+      );
       const data = await response.json();
 
       setId(data.id);
@@ -161,7 +173,7 @@ function App() {
           <div className="Cadastro">
             <form
               method="post"
-              action="http://localhost:2000/cadastrar"
+              action="https://api-cadastro-three.vercel.app/cadastrar"
               onSubmit={handleSubmitCadastro}
             >
               <h1 align="center" id="h1">
@@ -202,7 +214,10 @@ function App() {
           </div>
 
           <div className="Login">
-            <form method="post" action="http://localhost:2000/logar">
+            <form
+              method="post"
+              action="https://api-cadastro-three.vercel.app/logar"
+            >
               <h1 align="center">Login</h1>
               <label>Email</label>
               <input
@@ -241,7 +256,7 @@ function App() {
           <h2>ID {id}</h2>
           <form
             method="post"
-            action="http://localhost:2000/addImovel"
+            action="https://api-cadastro-three.vercel.app/addImovel"
             onSubmit={handleSubmitImovel}
           >
             <label>Nome do Imóvel</label>
