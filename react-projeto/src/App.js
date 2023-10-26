@@ -138,7 +138,7 @@ function App() {
         setElementos([]);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
